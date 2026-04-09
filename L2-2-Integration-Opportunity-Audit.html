@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>L2.2 - Integration Opportunity Audit</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafb;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .header { 
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+            color: white;
+            padding: 24px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+        }
+        .header h1 { font-size: 24px; margin-bottom: 8px; }
+        .header p { font-size: 14px; opacity: 0.9; }
+        
+        .section { 
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .section h2 { 
+            color: #0f172a;
+            font-size: 18px;
+            margin-bottom: 16px;
+            border-bottom: 2px solid #2563eb;
+            padding-bottom: 8px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 16px;
+            overflow-x: auto;
+        }
+        
+        th {
+            background: #0f172a;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 12px;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 13px;
+        }
+        
+        tr:hover { background: #f9fafb; }
+        
+        input, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-size: 12px;
+            font-family: inherit;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s;
+            margin-right: 8px;
+            margin-top: 16px;
+        }
+        
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+        .btn-primary:hover { background: #1d4ed8; }
+        
+        .btn-success {
+            background: #22c55e;
+            color: white;
+        }
+        .btn-success:hover { background: #16a34a; }
+        
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+        .btn-danger:hover { background: #dc2626; }
+        
+        .btn-sm {
+            padding: 6px 10px;
+            font-size: 12px;
+            margin: 0;
+        }
+        
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .summary-card {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+            color: white;
+            padding: 16px;
+            border-radius: 8px;
+        }
+        
+        .summary-card-label {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+        
+        .summary-card-value {
+            font-size: 24px;
+            font-weight: 700;
+        }
+        
+        .no-data {
+            text-align: center;
+            color: #6b7280;
+            padding: 32px;
+            font-style: italic;
+        }
+        
+        .tag {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        
+        .tag-high { background: #fee2e2; color: #991b1b; }
+        .tag-medium { background: #fef3c7; color: #92400e; }
+        .tag-low { background: #d1fae5; color: #065f46; }
+        
+        @media (max-width: 1024px) {
+            table { font-size: 11px; }
+            th, td { padding: 8px; }
+        }
+        
+        @media print {
+            body { background: white; }
+            .btn { display: none; }
+            .section { box-shadow: none; border: 1px solid #e5e7eb; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>L2.2 - Integration Opportunity Audit</h1>
+            <p>Identify where your tools should talk to each other, and calculate ROI for each integration</p>
+        </div>
+        
+        <div class="section">
+            <h2>📊 Summary</h2>
+            <div class="summary">
+                <div class="summary-card">
+                    <div class="summary-card-label">Total Tools</div>
+                    <div class="summary-card-value" id="totalTools">0</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-card-label">Integration Gaps</div>
+                    <div class="summary-card-value" id="totalGaps">0</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-card-label">Total Value (hrs/wk)</div>
+                    <div class="summary-card-value" id="totalValue">0</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-card-label">Annual Value @ $75/hr</div>
+                    <div class="summary-card-value" id="annualValue">$0</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>🛠️ Current Tools Audit</h2>
+            <div id="toolsTableContainer"></div>
+            <button class="btn btn-primary btn-sm" onclick="addToolRow()">+ Add Tool</button>
+        </div>
+        
+        <div class="section">
+            <h2>🔗 Integration Gap Analysis</h2>
+            <div id="gapTableContainer"></div>
+            <button class="btn btn-primary btn-sm" onclick="addGapRow()">+ Add Gap</button>
+        </div>
+        
+        <div class="section">
+            <button class="btn btn-success" onclick="exportCSV()">📥 Export as CSV</button>
+            <button class="btn btn-primary" onclick="window.print()">🖨️ Print</button>
+        </div>
+    </div>
+    
+    <script>
+        let tools = [];
+        let gaps = [];
+        
+        function addToolRow() {
+            tools.push({
+                name: '',
+                category: 'Other',
+                purpose: '',
+                integratesWith: '',
+                integrationType: 'None',
+                dataFlow: '1-way',
+                status: 'Active'
+            });
+            renderToolsTable();
+        }
+        
+        function addGapRow() {
+            gaps.push({
+                source: '',
+                target: '',
+                currentStatus: 'Manual',
+                hasGap: 'Yes',
+                nativeAvailable: 'No',
+                zapierAvailable: 'Yes',
+                setupEffort: 1,
+                valuePerWeek: 0,
+                roi: 'Medium'
+            });
+            renderGapTable();
+        }
+        
+        function deleteRow(arr, index) {
+            arr.splice(index, 1);
+            renderAll();
+        }
+        
+        function renderToolsTable() {
+            const categories = ['CRM', 'Finance', 'HR', 'Communication', 'Analytics', 'Automation', 'Other'];
+            const html = tools.length === 0 ? '<div class="no-data">No tools added yet</div>' : `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tool Name</th>
+                            <th>Category</th>
+                            <th>Purpose</th>
+                            <th>Integrates With</th>
+                            <th>Integration Type</th>
+                            <th>Data Flow</th>
+                            <th>Status</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${tools.map((t, i) => `
+                            <tr>
+                                <td><input type="text" value="${t.name}" onchange="tools[${i}].name = this.value;" placeholder="e.g., HubSpot"></td>
+                                <td><select onchange="tools[${i}].category = this.value;">
+                                    ${categories.map(c => `<option ${t.category === c ? 'selected' : ''}>${c}</option>`).join('')}
+                                </select></td>
+                                <td><input type="text" value="${t.purpose}" onchange="tools[${i}].purpose = this.value;" placeholder="What it does"></td>
+                                <td><input type="text" value="${t.integratesWith}" onchange="tools[${i}].integratesWith = this.value;" placeholder="Other tools it connects to"></td>
+                                <td><select onchange="tools[${i}].integrationType = this.value;">
+                                    <option ${t.integrationType === 'None' ? 'selected' : ''}>None</option>
+                                    <option ${t.integrationType === 'Native' ? 'selected' : ''}>Native</option>
+                                    <option ${t.integrationType === 'API' ? 'selected' : ''}>API</option>
+                                    <option ${t.integrationType === 'Zapier' ? 'selected' : ''}>Zapier</option>
+                                </select></td>
+                                <td><select onchange="tools[${i}].dataFlow = this.value;">
+                                    <option ${t.dataFlow === '1-way' ? 'selected' : ''}>1-way</option>
+                                    <option ${t.dataFlow === '2-way' ? 'selected' : ''}>2-way</option>
+                                </select></td>
+                                <td><select onchange="tools[${i}].status = this.value;">
+                                    <option ${t.status === 'Active' ? 'selected' : ''}>Active</option>
+                                    <option ${t.status === 'Trial' ? 'selected' : ''}>Trial</option>
+                                    <option ${t.status === 'Planned' ? 'selected' : ''}>Planned</option>
+                                </select></td>
+                                <td><button class="btn btn-danger btn-sm" onclick="deleteRow(tools, ${i})">Delete</button></td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            document.getElementById('toolsTableContainer').innerHTML = html;
+        }
+        
+        function renderGapTable() {
+            const html = gaps.length === 0 ? '<div class="no-data">No integration gaps added yet</div>' : `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Source Tool</th>
+                            <th>Target Tool</th>
+                            <th>Current Status</th>
+                            <th>Gap?</th>
+                            <th>Native Available?</th>
+                            <th>Zapier Available?</th>
+                            <th>Setup Hours</th>
+                            <th>Value (hrs/wk)</th>
+                            <th>ROI</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${gaps.map((g, i) => {
+                            const roiTag = g.roi === 'High' ? '<span class="tag tag-high">High</span>' : 
+                                          g.roi === 'Medium' ? '<span class="tag tag-medium">Medium</span>' : 
+                                          '<span class="tag tag-low">Low</span>';
+                            return `
+                            <tr>
+                                <td><input type="text" value="${g.source}" onchange="gaps[${i}].source = this.value;"></td>
+                                <td><input type="text" value="${g.target}" onchange="gaps[${i}].target = this.value;"></td>
+                                <td><select onchange="gaps[${i}].currentStatus = this.value;">
+                                    <option ${g.currentStatus === 'Manual' ? 'selected' : ''}>Manual</option>
+                                    <option ${g.currentStatus === 'Native' ? 'selected' : ''}>Native</option>
+                                    <option ${g.currentStatus === 'Zapier' ? 'selected' : ''}>Zapier</option>
+                                </select></td>
+                                <td><select onchange="gaps[${i}].hasGap = this.value; updateSummary();">
+                                    <option ${g.hasGap === 'Yes' ? 'selected' : ''}>Yes</option>
+                                    <option ${g.hasGap === 'No' ? 'selected' : ''}>No</option>
+                                </select></td>
+                                <td><select onchange="gaps[${i}].nativeAvailable = this.value;">
+                                    <option ${g.nativeAvailable === 'No' ? 'selected' : ''}>No</option>
+                                    <option ${g.nativeAvailable === 'Yes' ? 'selected' : ''}>Yes</option>
+                                </select></td>
+                                <td><select onchange="gaps[${i}].zapierAvailable = this.value;">
+                                    <option ${g.zapierAvailable === 'Yes' ? 'selected' : ''}>Yes</option>
+                                    <option ${g.zapierAvailable === 'No' ? 'selected' : ''}>No</option>
+                                </select></td>
+                                <td><input type="number" value="${g.setupEffort}" onchange="gaps[${i}].setupEffort = parseFloat(this.value) || 0;" min="0" step="0.5"></td>
+                                <td><input type="number" value="${g.valuePerWeek}" onchange="gaps[${i}].valuePerWeek = parseFloat(this.value) || 0; updateSummary();" min="0" step="0.5"></td>
+                                <td><select onchange="gaps[${i}].roi = this.value;">${roiTag === '<span class="tag tag-high">High</span>' ? '<option selected>High</option>' : '<option>High</option>'}${roiTag === '<span class="tag tag-medium">Medium</span>' ? '<option selected>Medium</option>' : '<option>Medium</option>'}${roiTag === '<span class="tag tag-low">Low</span>' ? '<option selected>Low</option>' : '<option>Low</option>'}</select></td>
+                                <td><button class="btn btn-danger btn-sm" onclick="deleteRow(gaps, ${i})">Delete</button></td>
+                            </tr>
+                        `}).join('')}
+                    </tbody>
+                </table>
+            `;
+            document.getElementById('gapTableContainer').innerHTML = html;
+        }
+        
+        function updateSummary() {
+            const totalT = tools.length;
+            const totalG = gaps.filter(g => g.hasGap === 'Yes').length;
+            const totalV = gaps.reduce((sum, g) => sum + (parseFloat(g.valuePerWeek) || 0), 0);
+            const annualV = totalV * 52 * 75;
+            
+            document.getElementById('totalTools').textContent = totalT;
+            document.getElementById('totalGaps').textContent = totalG;
+            document.getElementById('totalValue').textContent = totalV.toFixed(1);
+            document.getElementById('annualValue').textContent = '$' + Math.round(annualV).toLocaleString();
+        }
+        
+        function renderAll() {
+            renderToolsTable();
+            renderGapTable();
+            updateSummary();
+        }
+        
+        function exportCSV() {
+            let csv = 'Integration Opportunity Audit\n\n';
+            
+            csv += 'CURRENT TOOLS\n';
+            csv += 'Name,Category,Purpose,Integrates With,Integration Type,Data Flow,Status\n';
+            tools.forEach(t => {
+                csv += `"${t.name}","${t.category}","${t.purpose}","${t.integratesWith}","${t.integrationType}","${t.dataFlow}","${t.status}"\n`;
+            });
+            
+            csv += '\n\nINTEGRATION GAP ANALYSIS\n';
+            csv += 'Source,Target,Current Status,Has Gap,Native Available,Zapier Available,Setup Hours,Value (hrs/week),ROI\n';
+            gaps.forEach(g => {
+                csv += `"${g.source}","${g.target}","${g.currentStatus}","${g.hasGap}","${g.nativeAvailable}","${g.zapierAvailable}",${g.setupEffort},${g.valuePerWeek},"${g.roi}"\n`;
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Integration-Opportunity-Audit.csv';
+            a.click();
+        }
+        
+        renderAll();
+    </script>
+</body>
+</html>
