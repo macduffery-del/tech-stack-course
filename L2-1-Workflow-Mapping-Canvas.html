@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>L2.1 - Workflow Mapping Canvas</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafb;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { 
+            background: #0f172a;
+            color: white;
+            padding: 24px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+        }
+        .header h1 { font-size: 24px; margin-bottom: 8px; }
+        .header p { font-size: 14px; opacity: 0.9; }
+        
+        .section { 
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .section h2 { 
+            color: #0f172a;
+            font-size: 18px;
+            margin-bottom: 16px;
+            border-bottom: 2px solid #2563eb;
+            padding-bottom: 8px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 16px;
+        }
+        
+        th {
+            background: #0f172a;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        tr:hover { background: #f9fafb; }
+        
+        input, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-size: 13px;
+            font-family: inherit;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s;
+            margin-right: 8px;
+            margin-top: 16px;
+        }
+        
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+        .btn-primary:hover { background: #1d4ed8; }
+        
+        .btn-success {
+            background: #22c55e;
+            color: white;
+        }
+        .btn-success:hover { background: #16a34a; }
+        
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+        .btn-danger:hover { background: #dc2626; }
+        
+        .btn-sm {
+            padding: 6px 10px;
+            font-size: 12px;
+            margin: 0;
+        }
+        
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .summary-card {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+            color: white;
+            padding: 16px;
+            border-radius: 8px;
+        }
+        
+        .summary-card-label {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+        
+        .summary-card-value {
+            font-size: 28px;
+            font-weight: 700;
+        }
+        
+        .no-data {
+            text-align: center;
+            color: #6b7280;
+            padding: 32px;
+            font-style: italic;
+        }
+        
+        @media (max-width: 768px) {
+            table { font-size: 12px; }
+            th, td { padding: 8px; }
+            .header h1 { font-size: 20px; }
+        }
+        
+        @media print {
+            body { background: white; }
+            .btn { display: none; }
+            .section { box-shadow: none; border: 1px solid #e5e7eb; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>L2.1 - Workflow Mapping Canvas</h1>
+            <p>Map your core workflows, identify friction points, and calculate wasted hours</p>
+        </div>
+        
+        <div class="section">
+            <h2>📊 Summary</h2>
+            <div class="summary">
+                <div class="summary-card">
+                    <div class="summary-card-label">Total Workflows</div>
+                    <div class="summary-card-value" id="totalWorkflows">0</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-card-label">Total Hours/Week Wasted</div>
+                    <div class="summary-card-value" id="totalHours">0</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-card-label">Annual Hours Lost</div>
+                    <div class="summary-card-value" id="annualHours">0</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-card-label">$ Value @ $75/hr</div>
+                    <div class="summary-card-value" id="dollarValue">$0</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>🔄 Workflow Overview</h2>
+            <div id="workflowTableContainer"></div>
+            <button class="btn btn-primary btn-sm" onclick="addWorkflowRow()">+ Add Workflow</button>
+        </div>
+        
+        <div class="section">
+            <h2>⚙️ Friction Point Details</h2>
+            <div id="frictionTableContainer"></div>
+            <button class="btn btn-primary btn-sm" onclick="addFrictionRow()">+ Add Friction Point</button>
+        </div>
+        
+        <div class="section">
+            <h2>🔗 Integration Opportunities</h2>
+            <div id="integrationTableContainer"></div>
+            <button class="btn btn-primary btn-sm" onclick="addIntegrationRow()">+ Add Integration</button>
+        </div>
+        
+        <div class="section">
+            <button class="btn btn-success" onclick="exportCSV()">📥 Export as CSV</button>
+            <button class="btn btn-primary" onclick="window.print()">🖨️ Print</button>
+        </div>
+    </div>
+    
+    <script>
+        // Initialize data
+        let workflows = [];
+        let frictionPoints = [];
+        let integrations = [];
+        
+        function addWorkflowRow() {
+            workflows.push({
+                name: '',
+                steps: '',
+                tools: '',
+                touchpoints: '',
+                hoursWasted: 0,
+                status: 'Active'
+            });
+            renderWorkflowTable();
+        }
+        
+        function addFrictionRow() {
+            frictionPoints.push({
+                workflow: '',
+                step: '',
+                tool: '',
+                manualWork: '',
+                frequency: 'Daily',
+                hoursPerWeek: 0
+            });
+            renderFrictionTable();
+        }
+        
+        function addIntegrationRow() {
+            integrations.push({
+                from: '',
+                to: '',
+                currentMethod: 'Manual',
+                nativeIntegration: 'No',
+                zapierPossible: 'Yes',
+                timeSavedPerWeek: 0,
+                priority: 'Medium'
+            });
+            renderIntegrationTable();
+        }
+        
+        function deleteRow(arr, index) {
+            arr.splice(index, 1);
+            renderAll();
+        }
+        
+        function renderWorkflowTable() {
+            const html = workflows.length === 0 ? '<div class="no-data">No workflows added yet</div>' : `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Workflow Name</th>
+                            <th>Core Steps</th>
+                            <th>Tools Involved</th>
+                            <th>Manual Touchpoints</th>
+                            <th>Hours/Week Wasted</th>
+                            <th>Status</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${workflows.map((w, i) => `
+                            <tr>
+                                <td><input type="text" value="${w.name}" onchange="workflows[${i}].name = this.value; updateSummary();" placeholder="e.g., Lead to Customer"></td>
+                                <td><input type="text" value="${w.steps}" onchange="workflows[${i}].steps = this.value;" placeholder="List steps"></td>
+                                <td><input type="text" value="${w.tools}" onchange="workflows[${i}].tools = this.value;" placeholder="e.g., HubSpot, Slack"></td>
+                                <td><input type="text" value="${w.touchpoints}" onchange="workflows[${i}].touchpoints = this.value;" placeholder="Manual actions"></td>
+                                <td><input type="number" value="${w.hoursWasted}" onchange="workflows[${i}].hoursWasted = parseFloat(this.value) || 0; updateSummary();" min="0" step="0.5"></td>
+                                <td><select onchange="workflows[${i}].status = this.value;">
+                                    <option ${w.status === 'Active' ? 'selected' : ''}>Active</option>
+                                    <option ${w.status === 'Planned' ? 'selected' : ''}>Planned</option>
+                                    <option ${w.status === 'Complete' ? 'selected' : ''}>Complete</option>
+                                </select></td>
+                                <td><button class="btn btn-danger btn-sm" onclick="deleteRow(workflows, ${i})">Delete</button></td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            document.getElementById('workflowTableContainer').innerHTML = html;
+        }
+        
+        function renderFrictionTable() {
+            const html = frictionPoints.length === 0 ? '<div class="no-data">No friction points added yet</div>' : `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Workflow</th>
+                            <th>Step</th>
+                            <th>Tool</th>
+                            <th>Manual Work Required</th>
+                            <th>Frequency</th>
+                            <th>Hours/Week</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${frictionPoints.map((f, i) => `
+                            <tr>
+                                <td><input type="text" value="${f.workflow}" onchange="frictionPoints[${i}].workflow = this.value;"></td>
+                                <td><input type="text" value="${f.step}" onchange="frictionPoints[${i}].step = this.value;"></td>
+                                <td><input type="text" value="${f.tool}" onchange="frictionPoints[${i}].tool = this.value;"></td>
+                                <td><input type="text" value="${f.manualWork}" onchange="frictionPoints[${i}].manualWork = this.value;"></td>
+                                <td><select onchange="frictionPoints[${i}].frequency = this.value;">
+                                    <option ${f.frequency === 'Daily' ? 'selected' : ''}>Daily</option>
+                                    <option ${f.frequency === 'Weekly' ? 'selected' : ''}>Weekly</option>
+                                    <option ${f.frequency === 'Monthly' ? 'selected' : ''}>Monthly</option>
+                                </select></td>
+                                <td><input type="number" value="${f.hoursPerWeek}" onchange="frictionPoints[${i}].hoursPerWeek = parseFloat(this.value) || 0; updateSummary();" min="0" step="0.5"></td>
+                                <td><button class="btn btn-danger btn-sm" onclick="deleteRow(frictionPoints, ${i})">Delete</button></td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            document.getElementById('frictionTableContainer').innerHTML = html;
+        }
+        
+        function renderIntegrationTable() {
+            const html = integrations.length === 0 ? '<div class="no-data">No integrations added yet</div>' : `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>From Tool</th>
+                            <th>To Tool</th>
+                            <th>Current Method</th>
+                            <th>Native Integration?</th>
+                            <th>Zapier Possible?</th>
+                            <th>Time Saved/Week</th>
+                            <th>Priority</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${integrations.map((int, i) => `
+                            <tr>
+                                <td><input type="text" value="${int.from}" onchange="integrations[${i}].from = this.value;"></td>
+                                <td><input type="text" value="${int.to}" onchange="integrations[${i}].to = this.value;"></td>
+                                <td><select onchange="integrations[${i}].currentMethod = this.value;">
+                                    <option ${int.currentMethod === 'Manual' ? 'selected' : ''}>Manual</option>
+                                    <option ${int.currentMethod === 'Native' ? 'selected' : ''}>Native</option>
+                                    <option ${int.currentMethod === 'Zapier' ? 'selected' : ''}>Zapier</option>
+                                </select></td>
+                                <td><select onchange="integrations[${i}].nativeIntegration = this.value;">
+                                    <option ${int.nativeIntegration === 'No' ? 'selected' : ''}>No</option>
+                                    <option ${int.nativeIntegration === 'Yes' ? 'selected' : ''}>Yes</option>
+                                </select></td>
+                                <td><select onchange="integrations[${i}].zapierPossible = this.value;">
+                                    <option ${int.zapierPossible === 'Yes' ? 'selected' : ''}>Yes</option>
+                                    <option ${int.zapierPossible === 'No' ? 'selected' : ''}>No</option>
+                                </select></td>
+                                <td><input type="number" value="${int.timeSavedPerWeek}" onchange="integrations[${i}].timeSavedPerWeek = parseFloat(this.value) || 0;" min="0" step="0.5"></td>
+                                <td><select onchange="integrations[${i}].priority = this.value;">
+                                    <option ${int.priority === 'High' ? 'selected' : ''}>High</option>
+                                    <option ${int.priority === 'Medium' ? 'selected' : ''}>Medium</option>
+                                    <option ${int.priority === 'Low' ? 'selected' : ''}>Low</option>
+                                </select></td>
+                                <td><button class="btn btn-danger btn-sm" onclick="deleteRow(integrations, ${i})">Delete</button></td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            document.getElementById('integrationTableContainer').innerHTML = html;
+        }
+        
+        function updateSummary() {
+            const totalWF = workflows.length;
+            const totalHours = workflows.reduce((sum, w) => sum + (w.hoursWasted || 0), 0) +
+                             frictionPoints.reduce((sum, f) => sum + (f.hoursPerWeek || 0), 0);
+            const annualHours = totalHours * 52;
+            const dollarValue = annualHours * 75;
+            
+            document.getElementById('totalWorkflows').textContent = totalWF;
+            document.getElementById('totalHours').textContent = totalHours.toFixed(1);
+            document.getElementById('annualHours').textContent = (annualHours).toLocaleString();
+            document.getElementById('dollarValue').textContent = '$' + dollarValue.toLocaleString(undefined, {maximumFractionDigits: 0});
+        }
+        
+        function renderAll() {
+            renderWorkflowTable();
+            renderFrictionTable();
+            renderIntegrationTable();
+            updateSummary();
+        }
+        
+        function exportCSV() {
+            let csv = 'Workflow Mapping Canvas Export\n\n';
+            
+            csv += 'WORKFLOWS\n';
+            csv += 'Name,Steps,Tools,Manual Touchpoints,Hours/Week,Status\n';
+            workflows.forEach(w => {
+                csv += `"${w.name}","${w.steps}","${w.tools}","${w.touchpoints}",${w.hoursWasted},"${w.status}"\n`;
+            });
+            
+            csv += '\n\nFRICTION POINTS\n';
+            csv += 'Workflow,Step,Tool,Manual Work,Frequency,Hours/Week\n';
+            frictionPoints.forEach(f => {
+                csv += `"${f.workflow}","${f.step}","${f.tool}","${f.manualWork}","${f.frequency}",${f.hoursPerWeek}\n`;
+            });
+            
+            csv += '\n\nINTEGRATIONS\n';
+            csv += 'From,To,Current Method,Native Integration,Zapier Possible,Time Saved/Week,Priority\n';
+            integrations.forEach(i => {
+                csv += `"${i.from}","${i.to}","${i.currentMethod}","${i.nativeIntegration}","${i.zapierPossible}",${i.timeSavedPerWeek},"${i.priority}"\n`;
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Workflow-Mapping-Canvas.csv';
+            a.click();
+        }
+        
+        // Initialize
+        renderAll();
+    </script>
+</body>
+</html>
