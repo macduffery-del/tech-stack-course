@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>L2.3 - Integration Priority Matrix</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafb;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { 
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+            color: white;
+            padding: 24px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+        }
+        .header h1 { font-size: 24px; margin-bottom: 8px; }
+        .header p { font-size: 14px; opacity: 0.9; }
+        
+        .section { 
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .section h2 { 
+            color: #0f172a;
+            font-size: 18px;
+            margin-bottom: 16px;
+            border-bottom: 2px solid #2563eb;
+            padding-bottom: 8px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 16px;
+        }
+        
+        th {
+            background: #0f172a;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 13px;
+        }
+        
+        tr:hover { background: #f9fafb; }
+        
+        input, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-size: 12px;
+            font-family: inherit;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s;
+            margin-right: 8px;
+            margin-top: 16px;
+        }
+        
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+        .btn-primary:hover { background: #1d4ed8; }
+        
+        .btn-success {
+            background: #22c55e;
+            color: white;
+        }
+        .btn-success:hover { background: #16a34a; }
+        
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+        .btn-danger:hover { background: #dc2626; }
+        
+        .btn-sm {
+            padding: 6px 10px;
+            font-size: 12px;
+            margin: 0;
+        }
+        
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .summary-card {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+            color: white;
+            padding: 16px;
+            border-radius: 8px;
+        }
+        
+        .summary-card-label {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+        
+        .summary-card-value {
+            font-size: 28px;
+            font-weight: 700;
+        }
+        
+        .no-data {
+            text-align: center;
+            color: #6b7280;
+            padding: 32px;
+            font-style: italic;
+        }
+        
+        .rank-badge {
+            display: inline-block;
+            background: #2563eb;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 12px;
+        }
+        
+        .priority-high { background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); }
+        .priority-medium { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+        .priority-low { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+        
+        @media (max-width: 768px) {
+            table { font-size: 11px; }
+            th, td { padding: 8px; }
+        }
+        
+        @media print {
+            body { background: white; }
+            .btn { display: none; }
+            .section { box-shadow: none; border: 1px solid #e5e7eb; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>L2.3 - Integration Priority Matrix</h1>
+            <p>Score your integrations and build your implementation roadmap</p>
+        </div>
+        
+        <div class="section">
+            <h2>📊 Summary</h2>
+            <div class="summary">
+                <div class="summary-card">
+                    <div class="summary-card-label">Total Integrations</div>
+                    <div class="summary-card-value" id="totalIntegrations">0</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-card-label">High Priority</div>
+                    <div class="summary-card-value" id="highCount">0</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-card-label">Total Setup Hours</div>
+                    <div class="summary-card-value" id="totalSetup">0</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-card-label">Top 3 Score Sum</div>
+                    <div class="summary-card-value" id="topThreeScore">0</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>🎯 Scoring Matrix</h2>
+            <div id="scoringTableContainer"></div>
+            <button class="btn btn-primary btn-sm" onclick="addScoringRow()">+ Add Integration</button>
+        </div>
+        
+        <div class="section">
+            <h2>📋 Implementation Roadmap</h2>
+            <div id="roadmapTableContainer"></div>
+        </div>
+        
+        <div class="section">
+            <button class="btn btn-success" onclick="exportCSV()">📥 Export as CSV</button>
+            <button class="btn btn-primary" onclick="window.print()">🖨️ Print</button>
+        </div>
+    </div>
+    
+    <script>
+        let scoringData = [];
+        
+        function addScoringRow() {
+            scoringData.push({
+                integration: '',
+                frequency: 5,
+                impact: 5,
+                complexity: 2,
+                setupHours: 1
+            });
+            renderAll();
+        }
+        
+        function deleteRow(index) {
+            scoringData.splice(index, 1);
+            renderAll();
+        }
+        
+        function calculateScore(row) {
+            return (parseInt(row.frequency) || 0) * (parseInt(row.impact) || 0);
+        }
+        
+        function getSortedData() {
+            const sorted = [...scoringData].sort((a, b) => calculateScore(b) - calculateScore(a));
+            return sorted;
+        }
+        
+        function renderScoringTable() {
+            const html = scoringData.length === 0 ? '<div class="no-data">No integrations added yet</div>' : `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Integration</th>
+                            <th>Frequency (1-10)</th>
+                            <th>Impact (1-10)</th>
+                            <th>Priority Score</th>
+                            <th>Complexity (1-5)</th>
+                            <th>Setup Hours</th>
+                            <th>Priority Rank</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${getSortedData().map((row, originalIndex) => {
+                            const score = calculateScore(row);
+                            const rank = getSortedData().indexOf(row) + 1;
+                            const priority = score >= 75 ? 'High' : score >= 40 ? 'Medium' : 'Low';
+                            const badgeClass = priority === 'High' ? 'priority-high' : priority === 'Medium' ? 'priority-medium' : 'priority-low';
+                            
+                            return `
+                            <tr>
+                                <td><input type="text" value="${row.integration}" onchange="scoringData[${originalIndex}].integration = this.value;" placeholder="e.g., HubSpot → QuickBooks"></td>
+                                <td><input type="number" value="${row.frequency}" onchange="scoringData[${originalIndex}].frequency = parseInt(this.value) || 0; renderAll();" min="1" max="10"></td>
+                                <td><input type="number" value="${row.impact}" onchange="scoringData[${originalIndex}].impact = parseInt(this.value) || 0; renderAll();" min="1" max="10"></td>
+                                <td style="font-weight: 700; color: #2563eb;">${score}</td>
+                                <td><input type="number" value="${row.complexity}" onchange="scoringData[${originalIndex}].complexity = parseInt(this.value) || 0;" min="1" max="5"></td>
+                                <td><input type="number" value="${row.setupHours}" onchange="scoringData[${originalIndex}].setupHours = parseFloat(this.value) || 0; updateSummary();" min="0" step="0.5"></td>
+                                <td><span class="rank-badge ${badgeClass}">${rank}</span></td>
+                                <td><button class="btn btn-danger btn-sm" onclick="deleteRow(${originalIndex})">Delete</button></td>
+                            </tr>
+                        `}).join('')}
+                    </tbody>
+                </table>
+            `;
+            document.getElementById('scoringTableContainer').innerHTML = html;
+        }
+        
+        function renderRoadmap() {
+            const sorted = getSortedData();
+            const html = sorted.length === 0 ? '<div class="no-data">Add integrations to generate roadmap</div>' : `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Priority</th>
+                            <th>Integration</th>
+                            <th>Score</th>
+                            <th>Setup Hours</th>
+                            <th>Start Date</th>
+                            <th>Target Date</th>
+                            <th>Owner</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${sorted.map((row, rank) => {
+                            const score = calculateScore(row);
+                            return `
+                            <tr>
+                                <td><span class="rank-badge ${score >= 75 ? 'priority-high' : score >= 40 ? 'priority-medium' : 'priority-low'}">${rank + 1}</span></td>
+                                <td>${row.integration}</td>
+                                <td style="font-weight: 700;">${score}</td>
+                                <td>${row.setupHours}</td>
+                                <td><input type="date" placeholder="Start date"></td>
+                                <td><input type="date" placeholder="Target date"></td>
+                                <td><input type="text" placeholder="Owner name"></td>
+                                <td><select>
+                                    <option>Not Started</option>
+                                    <option>In Progress</option>
+                                    <option>Complete</option>
+                                    <option>Blocked</option>
+                                </select></td>
+                            </tr>
+                        `}).join('')}
+                    </tbody>
+                </table>
+            `;
+            document.getElementById('roadmapTableContainer').innerHTML = html;
+        }
+        
+        function updateSummary() {
+            const sorted = getSortedData();
+            const totalSetup = scoringData.reduce((sum, row) => sum + (parseFloat(row.setupHours) || 0), 0);
+            const highCount = sorted.filter(r => calculateScore(r) >= 75).length;
+            const topThree = sorted.slice(0, 3).reduce((sum, r) => sum + calculateScore(r), 0);
+            
+            document.getElementById('totalIntegrations').textContent = scoringData.length;
+            document.getElementById('highCount').textContent = highCount;
+            document.getElementById('totalSetup').textContent = totalSetup.toFixed(1);
+            document.getElementById('topThreeScore').textContent = topThree;
+        }
+        
+        function renderAll() {
+            renderScoringTable();
+            renderRoadmap();
+            updateSummary();
+        }
+        
+        function exportCSV() {
+            const sorted = getSortedData();
+            let csv = 'Integration Priority Matrix\n\n';
+            
+            csv += 'SCORING MATRIX\n';
+            csv += 'Integration,Frequency,Impact,Score,Complexity,Setup Hours,Priority\n';
+            sorted.forEach((row, rank) => {
+                const score = calculateScore(row);
+                const priority = score >= 75 ? 'High' : score >= 40 ? 'Medium' : 'Low';
+                csv += `"${row.integration}",${row.frequency},${row.impact},${score},${row.complexity},${row.setupHours},"${priority}"\n`;
+            });
+            
+            csv += '\n\nIMPLEMENTATION ROADMAP\n';
+            csv += 'Priority,Integration,Score,Setup Hours,Start Date,Target Date,Owner,Status\n';
+            sorted.forEach((row, rank) => {
+                const score = calculateScore(row);
+                csv += `${rank + 1},"${row.integration}",${score},${row.setupHours},"","","","Not Started"\n`;
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Integration-Priority-Matrix.csv';
+            a.click();
+        }
+        
+        renderAll();
+    </script>
+</body>
+</html>
